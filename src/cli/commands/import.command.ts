@@ -13,6 +13,7 @@ export class ImportCommand implements Command {
     return '--import';
   }
 
+  //Печать предложения
   private printOffer (offers: Offer[]): void {
     offers.forEach((row,index) => {
       console.log(chalk.bgYellow(`Предложение ${index + 1}:`));
@@ -26,12 +27,14 @@ export class ImportCommand implements Command {
     });
   }
 
+  //Печать вложенных объектов
   private printObject (object: User | Location): void {
     for (const [key, value] of Object.entries(object)) {
       this.printProperty(key,value);
     }
   }
 
+  //Печать свойства
   private printProperty (key: string, value: FlatOffer):void {
     console.log(`${chalk.green(key)}: ${chalk.red(value)}`);
   }
