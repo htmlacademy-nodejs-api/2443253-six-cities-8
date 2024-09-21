@@ -26,3 +26,4 @@ export type Offer = OfferPreview & {
   reviewsCount :number;//количество отзывов
 };
 
+export type FlatOffer = string | number | boolean |string[] | Date | Goods[];
