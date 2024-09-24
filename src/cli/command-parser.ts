@@ -1,4 +1,3 @@
-
 type ParsedCommand = Record<string, string[]>
 
 export class CommandParser {

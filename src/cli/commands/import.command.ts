@@ -1,61 +1,43 @@
 import { Command } from './command.interface.js';
 import { TSVFileReader } from '../../shared/libs/file-reader/index.js';
-import chalk from 'chalk';
-import { Goods } from '../../shared/types/goods.type.js';
-import { Location } from '../../shared/types/location.type.js';
-import { User } from '../../shared/types/user.type.js';
-import { Offer } from '../../shared/types/offer.type.js';
+import { Offer } from '../../shared/types/index.js';
+import { getErrorMessage } from '../../shared/helpers/index.js';
+import { printOffer } from '../../shared/helpers/common.js';
 
-type FlatOffer = string | number | boolean |string[] | Date | Goods[]
 
 export class ImportCommand implements Command {
+
+
   public getName(): string {
     return '--import';
   }
 
-  //Печать предложения
-  private printOffer (offers: Offer[]): void {
-    offers.forEach((row,index) => {
-      console.log(chalk.bgYellow(`Предложение ${index + 1}:`));
-      for (const [key, value] of Object.entries(row)) {
-        if (typeof value === 'object') {
-          this.printObject(value as User | Location);
-        } else {
-          this.printProperty(key,value as FlatOffer);
-        }
-      }
-    });
+
+  //Событие: импорт выполнен полностью
+  private onCompleteImport(count: number) {
+    console.info(`${count} offers imported.`);
   }
 
-  //Печать вложенных объектов
-  private printObject (object: User | Location): void {
-    for (const [key, value] of Object.entries(object)) {
-      this.printProperty(key,value);
-    }
+  //Событие: предложение импортировано
+  private onImportedOffer(numberOffer:number,offer: Offer): void {
+    printOffer(numberOffer,offer);
   }
 
-  //Печать свойства
-  private printProperty (key: string, value: FlatOffer):void {
-    console.log(`${chalk.green(key)}: ${chalk.red(value)}`);
-  }
 
-  public execute(...parameters: string[]): void {
+  public async execute(...parameters: string[]): Promise<void> {
     // Чтение файла
     const [filename] = parameters;
     const fileReader = new TSVFileReader(filename.trim());
 
+    fileReader.on('offer', this.onImportedOffer);
+    fileReader.on('end', this.onCompleteImport);
     try {
       fileReader.read();
-      const data = fileReader.toArray();
-      this.printOffer(data);
     } catch (err) {
 
-      if (!(err instanceof Error)) {
-        throw err;
-      }
-
       console.error(`Can't import data from file: ${filename}`);
-      console.error(`Details: ${err.message}`);
+      console.error(getErrorMessage(err));
     }
   }
 }
+

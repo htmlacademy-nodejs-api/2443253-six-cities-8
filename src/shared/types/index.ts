@@ -5,5 +5,7 @@ export { Goods } from './goods.type.js';
 export { Location } from './location.type.js';
 export { OfferType } from './offer-type.type.js';
 export { User } from './user.type.js';
+export { FlatOffer } from './offer.type.js';
 
+export { MockServerData } from './mock-server-data.type.js';
 
