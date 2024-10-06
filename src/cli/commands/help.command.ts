@@ -14,6 +14,7 @@ export class HelpCommand implements Command {
             --version:                   # выводит информации о версии приложения. Версия приложения считывается из файла package.json.
             --help:                      # выводит информацию о списке поддерживаемых команд
             --import <path>:             # импортирует данные из *.tsv-файла
+            --generate <count> <path> <http://localhost:3123/api>     # генерирует данные с помощью mock-сервера и записывает их в *.tsv-файл
     `));
   }
 }
