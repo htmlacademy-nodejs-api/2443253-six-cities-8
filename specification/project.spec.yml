@@ -1,0 +1,737 @@
+openapi: 3.1.0
+info:
+  title: API сервер для демо-проекта «Шесть городов».
+  description: |-
+    * Список ресурсов и маршрутов сервера «Шесть городов».
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  version: 2.0.0
+tags:
+  - name: six-cities
+    description: Действия с предложениями и пользователями на сервере «Шесть городов».
+
+paths:
+  /six-cities/register:
+    post:
+      tags:
+        - six-cities
+      summary: Регистрация пользователя
+      description: Регистрирует нового пользователя.
+
+      requestBody:
+        description: Информация для создания нового пользователя.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createUser'
+        required: true
+
+      responses:
+        "201":
+          description: Пользователь зарегистрирован. Объект пользователя.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+
+        "409":
+          description: Пользователь с таким email уже существует.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userAlreadyExistsError'
+
+
+
+  /six-cities/login:
+    post:
+      tags:
+        - six-cities
+      summary: Авторизация пользователя
+      description: Авторизует пользователя на основе логина(email) и пароля
+
+      requestBody:
+        description: Информация для авторизации пользователя.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user'
+        required: true
+
+      responses:
+        "200":
+          description: Пользователь авторизован. Token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/token'
+
+        "401":
+          description: Ошибка авторизации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/authError'
+
+
+    get:
+      tags:
+        - six-cities
+      summary: Проверка состояния пользователя
+      description: Возвращает информацию по авторизованному пользователю и код состояния
+      parameters:
+      - name: X-Token
+        in: header
+        description: Авторизационный токен пользователя
+        required: true
+        schema:
+         $ref: '#/components/schemas/token'
+      responses:
+        "200":
+          description: Статус авторизации пользователя.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createUser'
+
+        "401":
+          description: Ошибка авторизации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/authError'
+
+
+
+
+  /six-cities/logout:
+    delete:
+      tags:
+        - six-cities
+      summary: Завершение сеанса
+      description: Завершает сеанс работы — выход из закрытой части приложения.
+      parameters:
+      - name: X-Token
+        in: header
+        description: Авторизационный токен пользователя
+        required: true
+        schema:
+         $ref: '#/components/schemas/token'
+      responses:
+        "204":
+          description: Сеанс завершен
+
+  /six-cities/offers:
+    get:
+      tags:
+        - six-cities
+      summary: Получить список предложений
+      description: Возвращает массив предложений для предварительного просмотра. Каждое предложение описано в виде объекта. Обратите внимание, что заголовок X-Token, для данного маршрута, не является обязательным. Для авторизованного пользователя данные о предложениях содержат флаг isFavorite.
+      parameters:
+      - name: X-Token
+        in: header
+        description: Авторизационный токен пользователя
+        schema:
+         $ref: '#/components/schemas/token'
+      responses:
+        "200":
+          description: Массив предложений
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offersPreview'
+        "400":
+          description: Ошибка при загрузке предложений
+
+
+  /six-cities/offers/{offerId}:
+    get:
+      tags:
+        - six-cities
+      summary: Получить предложение
+      description: Возвращает предложение с идентификатором offerId. Обратите внимание, что заголовок X-Token, для данного маршрута, не является обязательным. Для авторизованного пользователя данные о предложении содержат флаг isFavorite
+      parameters:
+      - name: offerId
+        in: path
+        description: Уникальный идентификатор предложения
+        required: true
+        schema:
+          type: string
+          examples: [6af6f711-c28d-4121-82cd-e0b462a27f00]
+      - name: X-Token
+        in: header
+        description: Авторизационный токен пользователя
+        schema:
+         $ref: '#/components/schemas/token'
+      responses:
+        "200":
+          description: Объект предложения
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offer'
+        "404":
+          description: Предложение не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundOfferError'
+
+  /six-cities/offers/{offerId}/nearby:
+    get:
+      tags:
+        - six-cities
+      summary: Получить список предложений неподалеку
+      description: Возвращает массив предложений. Каждое предложение описано в виде объекта. Обратите внимание, что заголовок X-Token, для данного маршрута, не является обязательным. Для авторизованного пользователя данные о предложениях содержат флаг isFavorite
+      parameters:
+      - name: offerId
+        in: path
+        description: Уникальный идентификатор предложения
+        required: true
+        schema:
+          type: string
+          examples: [6af6f711-c28d-4121-82cd-e0b462a27f00]
+      - name: X-Token
+        in: header
+        description: Авторизационный токен пользователя
+        schema:
+         $ref: '#/components/schemas/token'
+      responses:
+        "200":
+          description: Массив предложений
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offersPreview'
+        "404":
+          description: Предложение не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundOfferError'
+
+
+  /six-cities/favorite:
+     get:
+      tags:
+        - six-cities
+      summary: Получить список избранных предложений
+      description: Возвращает массив предложений, добавленных в избранное
+      parameters:
+      - name: X-Token
+        in: header
+        description: Авторизационный токен пользователя
+        required: true
+
+        schema:
+         $ref: '#/components/schemas/token'
+      responses:
+        "200":
+          description: Массив предложений
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offersPreview'
+        "404":
+          description: Предложение не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundOfferError'
+
+
+  /six-cities/favorite/{offerId}/{status}:
+    post:
+      tags:
+        - six-cities
+      summary: Изменить статус у избранного предложения
+      description: Возвращает предложение с идентификатором offerId. Обратите внимание, что заголовок X-Token, для данного маршрута, не является обязательным. Для авторизованного пользователя данные о предложении содержат флаг isFavorite
+      parameters:
+      - name: offerId
+        in: path
+        description: Уникальный идентификатор предложения
+        required: true
+        schema:
+          type: string
+          examples: [6af6f711-c28d-4121-82cd-e0b462a27f00]
+      - name: status
+        in: path
+        description: Статус избранного предложения. Может быть 1 или 0, где 1 добавляет предложение в избранное, а 0 удаляет
+        required: true
+        schema:
+          type: number
+          examples: [0]
+      - name: X-Token
+        in: header
+        description: Авторизационный токен пользователя
+        required: true
+        schema:
+         $ref: '#/components/schemas/token'
+
+      responses:
+        "200":
+          description: Возвращает предложение с идентификатором offerId с актуальным состоянием поля isFavorite
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offer'
+        "400":
+          description: Ошибка тела запроса
+          content:
+            application/json:
+              schema:
+                type: string
+                examples: [Wrong status to add offer in favorite]
+
+        "401":
+          description: Ошибка авторизации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/authError'
+
+        "404":
+          description: Предложение не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundOfferError'
+
+        "409":
+          description: Предложение уже в избранном
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offerAlreadyInFavoriteError'
+
+  /six-cities/comments/{offerId}:
+    get:
+      tags:
+        - six-cities
+      summary: Получить список комментариев
+      description: Возвращает список комментариев для предложения с идентификатором offerId
+      parameters:
+      - name: offerId
+        in: path
+        description: Уникальный идентификатор предложения
+        required: true
+        schema:
+         $ref: '#/components/schemas/token'
+      responses:
+        "200":
+          description: Массив комментариев
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/comments'
+        "404":
+          description: Предложение не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundOfferError'
+
+    post:
+      tags:
+        - six-cities
+      summary: Добавить новый комментарий
+      description: Добавляет новый комментарий для предложения с идентификатором offerId
+      parameters:
+      - name: offerId
+        in: path
+        description: Уникальный идентификатор предложения
+        required: true
+        schema:
+         $ref: '#/components/schemas/token'
+
+      requestBody:
+        description: Объект с новым комментарием
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/newComment'
+        required: true
+
+      responses:
+        "201":
+          description: Возвращает бъект нового комментария
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/comment'
+        "400":
+          description: Ошибка тела запроса
+          content:
+            application/json:
+              schema:
+                type: string
+                examples: [Wrong status to add offer in favorite]
+
+        "401":
+          description: Ошибка авторизации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/authError'
+
+        "404":
+          description: Предложение не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundOfferError'
+
+
+
+components:
+  schemas:
+    createUser:
+      type: object
+
+      properties:
+        name:
+          type: string
+          examples: [Oliver Conner]
+
+        avatarUrl:
+          type: string
+          examples: [https://url-to-image/image.png]
+
+        isPro:
+          type: boolean
+          examples: [false,true]
+
+        email:
+          type: string
+          examples: [keks@htmlacademy.ru]
+
+        password:
+          type: string
+          examples: [123456]
+
+      required:
+        - name
+        - type
+        - email
+        - password
+
+
+    user:
+      type: object
+
+      properties:
+        email:
+          type: string
+          examples: [keks@htmlacademy.ru]
+
+        password:
+          type: string
+          examples: [123456]
+
+      required:
+        - email
+        - password
+
+
+    token:
+      type: object
+
+      properties:
+        token:
+          type: string
+          examples: [T2xpdmVyLmNvbm5lckBnbWFpbC5jb20]
+
+
+    offerPreview:
+      type: object
+
+      properties:
+
+        title:
+          type: string
+          minLength: 10
+          maxLength: 100
+          examples: [Beautiful & luxurious studio at great location]
+
+        type:
+          $ref: '#/components/schemas/type'
+
+        price:
+          type: number
+          minimum: 100
+          maximum: 100000
+          examples: [120]
+
+        city:
+          $ref: '#/components/schemas/city'
+
+        location:
+          $ref: '#/components/schemas/location'
+
+        isFavorite:
+          type: boolean
+          examples: [false]
+
+        isPremium:
+          type: boolean
+          examples: [true]
+
+        rating:
+          $ref: "#/components/schemas/rating"
+
+        previewImage:
+          type: string
+          examples: [https://url-to-image/image.png]
+
+      required:
+        - title
+        - city
+        - previewImage
+        - isPremium
+        - isFavorite
+        - rating
+        - type
+        - price
+        - location
+
+    offersPreview:
+      type: array
+
+      items:
+        $ref: "#/components/schemas/offerPreview"
+
+    city:
+      type: object
+
+      properties:
+        name:
+         type: string
+         enum: [Amsterdam, Paris, Cologne, Brussels, Hamburg, Dusseldorf]
+         examples: [Amsterdam]
+
+        location:
+          $ref: "#/components/schemas/location"
+
+
+    location:
+      type: object
+
+      properties:
+        latitude:
+          type: number
+          examples: [52.35514938496378]
+        longitude:
+          type: number
+          examples: [4.673877537499948]
+        zoom:
+          type: number
+          examples: [8]
+
+    rating:
+      type: number
+      minimum: 1
+      maximum: 5
+      examples: [3.1]
+
+    type:
+      type: string
+      enum: [apartment, house, room, hotel]
+      examples: [apartment]
+
+    offer:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 10
+          maxLength: 100
+          examples: [Beautiful & luxurious studio at great location]
+
+        type:
+          $ref: '#/components/schemas/type'
+
+        price:
+          type: number
+          minimum: 100
+          maximum: 100000
+          examples: [120]
+
+        city:
+          $ref: '#/components/schemas/city'
+
+        location:
+          $ref: '#/components/schemas/location'
+
+        isFavorite:
+          type: boolean
+          examples: [false]
+
+        isPremium:
+          type: boolean
+          examples: [true]
+
+        rating:
+          $ref: "#/components/schemas/rating"
+
+        previewImage:
+          type: string
+          examples: [https://url-to-image/image.png]
+
+        description:
+          type: string
+          minLength: 20
+          maxLength: 1024
+          examples: [A quiet cozy and picturesque that hides behind a a river by the unique lightness of Amsterdam.]
+
+        postDate:
+          type: string
+          format: date-time
+          examples: [2024-10-03T06:48:13.966Z]
+
+        bedrooms:
+          type:number:
+          minLength: 1
+          maxLength: 8
+          examples: [4]
+
+        goods:
+          type: array
+          description: Удобства
+          items:
+          enum: [Breakfast, Air conditioning, Laptop friendly workspace, Baby seat, Washer, Towels, Fridge]
+          examples: ["Breakfast"]
+
+        host:
+          $ref: "#/components/schemas/userEntity"
+
+        images:
+          type: array
+          maxItems: 6
+          examples: ["https://url-to-image/image.png"]
+
+        maxAdults:
+          type: number
+          minimum: 1
+          maximum: 10
+          examples: [4]
+
+      required:
+        - title
+        - city
+        - previewImage
+        - isPremium
+        - isFavorite
+        - rating
+        - type
+        - price
+        - location
+        - description
+        - postDate
+        - bedrooms
+        - goods
+        - host
+        - images
+        - maxAdults
+
+
+    userEntity:
+      type: object
+
+      properties:
+        name:
+          type: string
+          examples: [Oliver Conner]
+
+        avatarUrl:
+          type: string
+          examples: [https://url-to-image/image.png]
+
+        isPro:
+          type: boolean
+          examples: [false]
+
+    comments:
+      type: array
+
+      items:
+        $ref: "#/components/schemas/comment"
+
+    comment:
+      type: object
+
+      properties:
+        date:
+          type: string
+          format: date-time
+          examples: [2024-10-03T06:48:13.966Z]
+
+        user:
+          $ref: "#/components/schemas/userEntity"
+
+        comment:
+          type: string
+          examples: [A quiet cozy and picturesque that hides behind a a river by the unique lightness of Amsterdam.]
+
+        rating:
+          $ref: "#/components/schemas/rating"
+
+    newComment:
+          type: object
+          properties:
+            comment:
+              type: string
+              examples: [A quiet cozy and picturesque that hides behind a a river by the unique lightness of Amsterdam.]
+
+            rating:
+              $ref: "#/components/schemas/rating"
+
+# Описания ошибок
+    commonError:
+      type: object
+      properties:
+        errorType:
+          type: string
+          examples: [COMMON_ERROR]
+        message:
+          type: string
+
+    tokenNotFoundError:
+      allOf:
+        - $ref: '#/components/schemas/commonError'
+        - type: object
+          properties:
+            message:
+              examples: [Токен не найден.]
+
+    notFoundOfferError:
+      allOf:
+        - $ref: '#/components/schemas/commonError'
+        - type: object
+          properties:
+            message:
+              examples: [Предложение не найдено.]
+
+    authError:
+      allOf:
+        - $ref: '#/components/schemas/commonError'
+        - type: object
+          properties:
+            message:
+              examples: [Пользователь не авторизован.]
+
+    userAlreadyExistsError:
+      allOf:
+        - $ref: '#/components/schemas/commonError'
+        - type: object
+          properties:
+            message:
+              examples: [Пользователь c таким email уже существует.]
+
+    offerAlreadyInFavoriteError:
+      allOf:
+        - $ref: '#/components/schemas/commonError'
+        - type: object
+          properties:
+            message:
+              examples: [Предложение уже добавлено в избранное.]
