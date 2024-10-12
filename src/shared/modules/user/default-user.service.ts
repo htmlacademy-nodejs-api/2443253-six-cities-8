@@ -6,6 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto.js';
 import { Component } from '../../types/index.js';
 import { Logger } from '../../libs/logger/index.js';
 import { inject, injectable } from 'inversify';
+import { UpdateUserDto } from './dto/update-user.dto.js';
 
 @injectable()
 export class DefaultUserService implements UserService {
@@ -23,6 +24,12 @@ export class DefaultUserService implements UserService {
     this.logger.info(`New user created: ${user.email}`);
 
     return result;
+  }
+
+  public async updateById(userId: string, dto: UpdateUserDto): Promise<DocumentType<UserEntity> | null> {
+    return this.userModel
+      .findByIdAndUpdate(userId, dto, { new: true })
+      .exec();
   }
 
   public async findByEmail(email: string): Promise<DocumentType<UserEntity> | null> {

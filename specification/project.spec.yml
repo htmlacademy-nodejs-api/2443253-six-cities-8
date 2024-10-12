@@ -177,6 +177,80 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/notFoundOfferError'
+    patch:
+      tags:
+        - six-cities
+      summary: Отредактировать предложение
+      description: Внести изменения в предложение с идентификатором offerId. Обратите внимание, что заголовок X-Token, для данного маршрута, не является обязательным. Для авторизованного пользователя данные о предложении содержат флаг isFavorite
+      parameters:
+      - name: offerId
+        in: path
+        description: Уникальный идентификатор предложения
+        required: true
+        schema:
+          type: string
+          examples: [6af6f711-c28d-4121-82cd-e0b462a27f00]
+      - name: X-Token
+        in: header
+        description: Авторизационный токен пользователя
+        schema:
+         $ref: '#/components/schemas/token'
+      requestBody:
+        description: Измененное предложение
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/offer'
+        required: true
+      responses:
+        "200":
+          description: Предложение изменено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offer'
+
+        "404":
+          description: Предложение не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundOfferError'
+    delete:
+      tags:
+        - six-cities
+      summary: Удаление предложения
+      description: Удалить предложение с идентификатором offerId (обязательно), X-Token - обязательно
+      parameters:
+      - name: offerId
+        in: path
+        description: Уникальный идентификатор предложения
+        required: true
+        schema:
+          type: string
+          examples: [6af6f711-c28d-4121-82cd-e0b462a27f00]
+      - name: X-Token
+        in: header
+        description: Авторизационный токен пользователя
+        required: true
+        schema:
+         $ref: '#/components/schemas/token'
+      responses:
+        "200":
+          description: Предложение с идентификатором {offerId} удалено
+        "401":
+          description: Ошибка авторизации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/authError'
+        "404":
+          description: Предложение не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundOfferError'
+
 
   /six-cities/offers/{offerId}/nearby:
     get:
@@ -305,6 +379,35 @@ paths:
               schema:
                 $ref: '#/components/schemas/offerAlreadyInFavoriteError'
 
+  /six-cities/premium/{city}:
+     get:
+      tags:
+        - six-cities
+      summary: Получить список премиальных предложений для города
+      description: Возвращает массив предложений с флагои Premium = true для выбранного города
+      parameters:
+      - name: city
+        in: path
+        description: выбранный город
+        required: true
+        schema:
+         type: string
+         enum: [Amsterdam, Paris, Cologne, Brussels, Hamburg, Dusseldorf]
+         examples: [Amsterdam]
+      responses:
+        "200":
+          description: Массив премиальных предложений
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offersPreview'
+        "410":
+          description: город не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundCityError'
+
   /six-cities/comments/{offerId}:
     get:
       tags:
@@ -317,7 +420,8 @@ paths:
         description: Уникальный идентификатор предложения
         required: true
         schema:
-         $ref: '#/components/schemas/token'
+          type: string
+          examples: [6af6f711-c28d-4121-82cd-e0b462a27f00]
       responses:
         "200":
           description: Массив комментариев
@@ -343,7 +447,14 @@ paths:
         description: Уникальный идентификатор предложения
         required: true
         schema:
+          type: string
+          examples: [6af6f711-c28d-4121-82cd-e0b462a27f00]
+      - name: X-Token
+        in: header
+        description: Авторизационный токен пользователя
+        schema:
          $ref: '#/components/schemas/token'
+        required: true
 
       requestBody:
         description: Объект с новым комментарием
@@ -711,6 +822,14 @@ components:
           properties:
             message:
               examples: [Предложение не найдено.]
+
+    notFoundCityError:
+      allOf:
+        - $ref: '#/components/schemas/commonError'
+        - type: object
+          properties:
+            message:
+              examples: [Город найден.]
 
     authError:
       allOf:

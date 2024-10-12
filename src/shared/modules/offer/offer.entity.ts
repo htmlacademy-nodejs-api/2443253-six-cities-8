@@ -8,6 +8,7 @@ import {
 
 import { City, Goods, Location, OfferType} from '../../types/index.js';
 import { UserEntity } from '../user/index.js';
+import { CommentEntity } from '../comments/comment.entity.js';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export interface OfferEntity extends defaultClasses.Base {}
@@ -68,8 +69,17 @@ export class OfferEntity extends defaultClasses.TimeStamps {
     required: true})
   public userId: Ref<UserEntity>;
 
+  @prop({
+    ref: CommentEntity,
+    required: true,
+    default:[],
+    _id: false
+  })
+  public comments: Ref<CommentEntity>[];
+
   @prop({default:0})
-  public reviewsCount: number;
+  public commentsCount: number;
+
 
   @prop({required: true})
   public location: Location;

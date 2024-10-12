@@ -8,6 +8,7 @@ import { Component } from './shared/types/index.js';
 import { createRestApplicationContainer } from './rest/rest.container.js';
 import { createUserContainer } from './shared/modules/user/index.js';
 import { createOfferContainer } from './shared/modules/offer/index.js';
+import { createCommentContainer } from './shared/modules/comments/index.js';
 
 
 async function bootstrap() {
@@ -15,6 +16,7 @@ async function bootstrap() {
     createRestApplicationContainer(),
     createUserContainer(),
     createOfferContainer(),
+    createCommentContainer(),
   );
 
 
