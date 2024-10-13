@@ -9,7 +9,7 @@ import { UserService } from '../../shared/modules/user/user-service.interface.js
 import { MongoDatabaseClient } from '../../shared/libs/database-client/mongo.database-client.js';
 import { ConsoleLogger } from '../../shared/libs/logger/console.logger.js';
 import { OfferModel } from '../../shared/modules/offer/offer.entity.js';
-import { DefaultOfferService } from '../../shared/modules/offer/offer.service.js';
+import { DefaultOfferService } from '../../shared/modules/offer/default-offer.service.js';
 import { DefaultUserService } from '../../shared/modules/user/default-user.service.js';
 import { UserModel } from '../../shared/modules/user/user.entity.js';
 import { Logger } from '../../shared/libs/logger/index.js';

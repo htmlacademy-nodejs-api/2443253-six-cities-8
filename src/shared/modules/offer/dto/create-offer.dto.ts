@@ -1,4 +1,4 @@
-import { City } from '../../../types/city.type.js';
+import { City } from '../../../types/city.enum.js';
 import { Location } from '../../../types/location.type.js';
 import { OfferType } from '../../../types/offer-type.type.js';
 
@@ -21,4 +21,5 @@ export class CreateOfferDto {
   public userId: string;
   public reviewsCount: number;
   public location: Location;
+  public comments: string[];
 }

@@ -1,4 +1,4 @@
-import { City } from './city.type.js';
+import { City } from './city.enum.js';
 import { Goods } from './goods.type.js';
 import { Location } from './location.type.js';
 import { OfferType } from './offer-type.type.js';
@@ -23,7 +23,7 @@ export type Offer = OfferPreview & {
   user: User;//пользователь
   images: string[];//фотографии жилья
   maxAdults: number;//Количество гостей
-  reviewsCount :number;//количество отзывов
+  commentsCount :number;//количество отзывов
 };
 
 export type FlatOffer = string | number | boolean |string[] | Date | Goods[];
