@@ -14,6 +14,7 @@ import { DefaultUserService } from '../../shared/modules/user/default-user.servi
 import { UserModel } from '../../shared/modules/user/user.entity.js';
 import { Logger } from '../../shared/libs/logger/index.js';
 import { DEFAULT_DB_PORT, DEFAULT_USER_PASSWORD } from './command.const.js';
+import { mongoose } from '@typegoose/typegoose';
 
 
 export class ImportCommand implements Command {
@@ -58,12 +59,13 @@ export class ImportCommand implements Command {
 
 
     await this.offerService.create({
+      id: new mongoose.Types.ObjectId(''),
       title: offer.title,
       description: offer.description,
       postDate: offer.postDate,
       city: offer.city,
       previewImage: offer.previewImage,
-      images: offer.images.join(';'),
+      images: offer.images,
       isPremium: offer.isPremium,
       isFavorite: offer.isFavorite,
       rating: offer.rating,
@@ -71,10 +73,10 @@ export class ImportCommand implements Command {
       bedrooms: offer.bedrooms,
       maxAdults: offer.maxAdults,
       price: offer.price,
-      goods: offer.goods.join(';'),
+      goods: offer.goods,
       userId: user.id,
-      reviewsCount: offer.reviewsCount,
-      location: offer.location
+      commentsCount: offer.commentsCount,
+      location: offer.location,
     });
 
   }

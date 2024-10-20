@@ -8,7 +8,6 @@ import {
 
 import { City, Goods, Location, OfferType} from '../../types/index.js';
 import { UserEntity } from '../user/index.js';
-import { CommentEntity } from '../comments/comment.entity.js';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export interface OfferEntity extends defaultClasses.Base {}
@@ -21,6 +20,8 @@ export interface OfferEntity extends defaultClasses.Base {}
 })
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class OfferEntity extends defaultClasses.TimeStamps {
+
+
   @prop({required: true})
   public title: string;
 
@@ -38,7 +39,7 @@ export class OfferEntity extends defaultClasses.TimeStamps {
   public previewImage: string;
 
   @prop({required: true})
-  public images: string;
+  public images: string[];
 
   @prop({required: true})
   public isPremium: boolean;
@@ -62,20 +63,20 @@ export class OfferEntity extends defaultClasses.TimeStamps {
   public price: number;
 
   @prop({required: true})
-  public goods: Goods;
+  public goods: Goods[];
 
   @prop({
     ref: UserEntity,
     required: true})
   public userId: Ref<UserEntity>;
 
-  @prop({
-    ref: CommentEntity,
-    required: true,
-    default:[],
-    _id: false
-  })
-  public comments: Ref<CommentEntity>[];
+  // @prop({
+  //   ref: CommentEntity,
+  //   required: true,
+  //   default:[],
+  //   _id: false
+  // })
+  // public comments?: Ref<CommentEntity>[];
 
   @prop({default:0})
   public commentsCount: number;

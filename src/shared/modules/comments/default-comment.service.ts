@@ -14,7 +14,7 @@ export class DefaultCommentService implements CommentService {
 
 
   //Средний рейтинг текущего предложения
-  async countAverageRating(offerId: string): Promise<number> {
+  async countAverageRating(offerId: mongoose.Types.ObjectId): Promise<number> {
     const [comment] = await this.commentModel.aggregate<Record<string, number>>(
       [
         { $match: { offerId: new mongoose.Types.ObjectId(offerId) } },

@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { DocumentType, types } from '@typegoose/typegoose';
+import { DocumentType, mongoose, types } from '@typegoose/typegoose';
 
 import { OfferService } from './offer-service.interface.js';
 import { City, Component,SortType } from '../../types/index.js';
@@ -15,25 +15,26 @@ import { MAX_PREMIUN_COUNT } from './offer.constant.js';
 export class DefaultOfferService implements OfferService {
   constructor(
     @inject(Component.Logger) private readonly logger: Logger,
-    @inject(Component.OfferModel) private readonly offerModel: types.ModelType<OfferEntity>
+    @inject(Component.OfferModel) private readonly offerModel: types.ModelType<OfferEntity>,
+
   ) {}
 
   //2.1.Создание нового предложения.
   public async create(dto: CreateOfferDto): Promise<DocumentType<OfferEntity>> {
     const result = await this.offerModel.create(dto);
-    this.logger.info(`New offer created: ${dto.title}`);
+    this.logger.info(`Новое предложение создано: ${dto.title}`);
     return result;
   }
 
   //2.3.Удаление предложения.
-  public async deleteById(offerId: string): Promise<DocumentType<OfferEntity> | null> {
+  public async deleteById(offerId: mongoose.Types.ObjectId): Promise<DocumentType<OfferEntity> | null> {
     return this.offerModel
       .findByIdAndDelete(offerId)
       .exec();
   }
 
   //2.2.Редактирование предложения.
-  public async updateById(offerId: string, dto: UpdateOfferDto): Promise<DocumentType<OfferEntity> | null> {
+  public async updateById(offerId: mongoose.Types.ObjectId, dto: UpdateOfferDto): Promise<DocumentType<OfferEntity> | null> {
     return this.offerModel
       .findByIdAndUpdate(offerId, dto, {new: true})
       .populate(['userId', 'comments'])
@@ -42,20 +43,20 @@ export class DefaultOfferService implements OfferService {
 
   //2.5.Получение детальной информации о предложении,
   //2.6. Получение списка комментариев для предложения.
-  public async findByOfferId(offerId: string): Promise<DocumentType<OfferEntity> | null> {
+  public async findByOfferId(offerId: mongoose.Types.ObjectId): Promise<DocumentType<OfferEntity> | null> {
     return this.offerModel.findById(offerId).
       populate(['userId','comments']).
       exec();
   }
 
   //Проверка существования предложения.
-  public async exists(documentId: string): Promise<boolean> {
+  public async exists(documentId: mongoose.Types.ObjectId): Promise<boolean> {
     return (await this.offerModel
-      .exists({_id: documentId})) !== null;
+      .exists({_id: new mongoose.Types.ObjectId(documentId)})) !== null;
   }
 
   //Увеличивает количество комментариев для предложения.
-  public async incCommentCount(offerId: string): Promise<DocumentType<OfferEntity> | null> {
+  public async incCommentCount(offerId: mongoose.Types.ObjectId): Promise<DocumentType<OfferEntity> | null> {
     return this.offerModel
       .findByIdAndUpdate(offerId, {'$inc': {
         commentCount: 1,
@@ -104,7 +105,7 @@ export class DefaultOfferService implements OfferService {
   }
 
   //2.14. Добавление/удаление предложения в/из избранное.
-  public async updateFavoriteStatusByOfferId(offerId: string, dto: UpdateOfferDto): Promise<DocumentType<OfferEntity> | null> {
+  public async updateFavoriteStatusByOfferId(offerId: mongoose.Types.ObjectId, dto: UpdateOfferDto): Promise<DocumentType<OfferEntity> | null> {
     return this.offerModel
       .findByIdAndUpdate(offerId, {isFavorite: dto.isFavorite}, {new: true})
       .populate(['userId'])
