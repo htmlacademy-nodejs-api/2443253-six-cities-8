@@ -2,3 +2,69 @@
 GET http://localhost:3123/api HTTP/1.1
 
 ###
+
+# Предложения
+## Получить список предложений
+GET http://localhost:5000/offers HTTP/1.1
+Content-Type: application/json
+
+###
+
+## Добавить новую категорию
+POST http://localhost:5000/offers HTTP/1.1
+Content-Type: application/json
+{
+  "id": "671486c91a980ca4a17ddd6b",
+ "title": "New offer",
+ "description": "Discover daily local life in city center, friendly neighborhood, clandestine casino, karaoke, old-style artisans, art gallery and artist studio downstairs.",
+ "postDate": "2022-04-02T05:45:40.283Z",
+    "city": "Dusseldorf",
+    "previewImage": "https://16.design.htmlacademy.pro/static/hotel/20.jpg",
+    "images": [
+      ""
+    ],
+    "isPremium": false,
+    "isFavorite": true,
+    "rating": 2,
+    "type": "apartment",
+    "bedrooms": 6,
+    "maxAdults": 9,
+    "price": 16882,
+    "goods": ["Baby seat"],
+    "userId":"66fb7a9d8eb2d359e21834ac",
+    "commentsCount": 0,
+    "location": {
+      "latitude": 48.84461,
+      "longitude": 2.374499
+    }
+
+}
+
+###
+
+# Пользователи
+## Создать нового пользователя
+
+POST http://localhost:5000/register HTTP/1.1
+Content-Type: application/json
+{
+  "email": "torans@overlook.net",
+  "avatarPath": "torrance.png",
+  "firstname": "Jack",
+  "type" : "ordinary",
+  "password" : "12345"
+}
+
+###
+
+## Авторизовать пользователя
+
+POST http://localhost:5000/login HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "torans@overlook.net",
+  "password": "12345"
+}
+
+###

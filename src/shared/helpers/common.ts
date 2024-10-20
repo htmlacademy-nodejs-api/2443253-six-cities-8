@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import { FlatOffer, Location, Offer, User } from '../types/index.js';
+import { ClassConstructor, plainToInstance } from 'class-transformer';
 
 //Случайное число в диапазоне [min, max]
 export function generateRandomValue(min:number, max: number, numAfterDigit = 0) {
@@ -45,3 +46,13 @@ export function printObject (object: User | Location): void {
   }
 }
 
+export function fillDTO<T, V>(someDto: ClassConstructor<T>, plainObject: V) {
+  return plainToInstance(someDto, plainObject, { excludeExtraneousValues: true });
+}
+
+//создает объект со свойством - ошибка
+export function createErrorObject(message: string) {
+  return {
+    error: message,
+  };
+}

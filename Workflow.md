@@ -90,3 +90,6 @@ npm run mock:server
 ### Остальное
 
 Все остальные файлы в проекте являются служебными. Пожалуйста, не удаляйте и не изменяйте их самовольно. Только если того требует задание или наставник.
+
+### Команда импорта данных из файла в БД
+npm run ts ./src/main.cli.ts -- --import ./src/mocks/mock-data.tsv admin test localhost six-cities secret
