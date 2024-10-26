@@ -8,16 +8,16 @@ export interface OfferService {
   create(dto: CreateOfferDto): Promise<DocumentType<OfferEntity>>;
   //2.5.Получение детальной информации о предложении,
   //2.6. Получение списка комментариев для предложения.
-  findByOfferId(offerId: mongoose.Types.ObjectId): Promise<DocumentType<OfferEntity> | null>;
+  findByOfferId(offerId: string): Promise<DocumentType<OfferEntity> | null>;
   //2.4.Получение списка предложений по аренде.
   find(): Promise<DocumentType<OfferEntity>[]>;
   //2.3.Удаление предложения.
-  deleteById(offerId: mongoose.Types.ObjectId): Promise<DocumentType<OfferEntity> | null>;
+  deleteById(offerId: string): Promise<DocumentType<OfferEntity> | null>;
   //2.2.Редактирование предложения.
-  updateById(offerId: mongoose.Types.ObjectId, dto: UpdateOfferDto): Promise<DocumentType<OfferEntity> | null>;
+  updateById(offerId: string, dto: UpdateOfferDto): Promise<DocumentType<OfferEntity> | null>;
   // findByCategoryId(categoryId: string, count?: number): Promise<DocumentType<OfferEntity>[]>;
   //Увеличение количества комментариев для предложения.
-  incCommentCount(offerId: mongoose.Types.ObjectId): Promise<DocumentType<OfferEntity> | null>;
+  incCommentCount(offerId: string): Promise<DocumentType<OfferEntity> | null>;
   // findNew(count: number): Promise<DocumentType<OfferEntity>[]>;
   //2.12.Получение списка премиальных предложений для города.
   findPremiumOffersByCity(city: string): Promise<DocumentType<OfferEntity>[]>;
@@ -25,5 +25,5 @@ export interface OfferService {
   findFavoriteOffers(): Promise<DocumentType<OfferEntity>[]>;
   //2.14. Добавление/удаление предложения в/из избранное.
   updateFavoriteStatusByOfferId(offerId: mongoose.Types.ObjectId, dto: UpdateOfferDto): Promise<DocumentType<OfferEntity> | null>;
-  exists(documentId: mongoose.Types.ObjectId): Promise<boolean>;
+  exists(documentId: string): Promise<boolean>;
 }

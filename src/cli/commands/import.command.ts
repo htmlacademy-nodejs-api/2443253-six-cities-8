@@ -14,7 +14,8 @@ import { DefaultUserService } from '../../shared/modules/user/default-user.servi
 import { UserModel } from '../../shared/modules/user/user.entity.js';
 import { Logger } from '../../shared/libs/logger/index.js';
 import { DEFAULT_DB_PORT, DEFAULT_USER_PASSWORD } from './command.const.js';
-import { mongoose } from '@typegoose/typegoose';
+
+import { CommentModel } from '../../shared/modules/comments/comment.entity.js';
 
 
 export class ImportCommand implements Command {
@@ -29,7 +30,7 @@ export class ImportCommand implements Command {
     this.onCompleteImport = this.onCompleteImport.bind(this);
 
     this.logger = new ConsoleLogger();
-    this.offerService = new DefaultOfferService(this.logger, OfferModel);
+    this.offerService = new DefaultOfferService(this.logger, OfferModel,CommentModel);
     this.userService = new DefaultUserService(this.logger, UserModel);
     this.databaseClient = new MongoDatabaseClient(this.logger);
   }
@@ -59,7 +60,7 @@ export class ImportCommand implements Command {
 
 
     await this.offerService.create({
-      id: new mongoose.Types.ObjectId(''),
+      //id: '',
       title: offer.title,
       description: offer.description,
       postDate: offer.postDate,
@@ -77,6 +78,7 @@ export class ImportCommand implements Command {
       userId: user.id,
       commentsCount: offer.commentsCount,
       location: offer.location,
+      comments: [],
     });
 
   }
