@@ -379,7 +379,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/offerAlreadyInFavoriteError'
 
-  /six-cities/premium/{city}:
+  /six-cities/:city/premium:
      get:
       tags:
         - six-cities
