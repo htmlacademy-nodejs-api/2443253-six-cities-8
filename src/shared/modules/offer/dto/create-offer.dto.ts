@@ -36,8 +36,8 @@ export class CreateOfferDto {
   public isFavorite: boolean;
 
   @IsNumber({},{ message: CreateOfferValidationMessage.rating.invalidFormat })
-  @MinLength(1, { message: CreateOfferValidationMessage.rating.minValue })
-  @MaxLength(5, { message: CreateOfferValidationMessage.rating.maxValue })
+  @Min(1, { message: CreateOfferValidationMessage.rating.minValue })
+  @Max(5, { message: CreateOfferValidationMessage.rating.maxValue })
   public rating: number;
 
   @IsEnum(OfferType, { message: CreateOfferValidationMessage.type.invalidFormat })

@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 
 import { Logger } from '../../libs/logger/index.js';
 import { Component } from '../../types/index.js';
-import { BaseController, HttpError, HttpMethod } from '../../../rest/index.js';
+import { BaseController, DocumentExistsMiddleware, HttpError, HttpMethod } from '../../../rest/index.js';
 import { CreateOfferDto, OfferRdo, OfferService, PreviewOfferRdo } from './index.js';
 import { StatusCodes } from 'http-status-codes';
 import { fillDTO } from '../../helpers/index.js';
@@ -34,10 +34,10 @@ export class OfferController extends BaseController {
     this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.create, middlewares: [new ValidateDtoMiddleware(CreateOfferDto)]});
     this.addRoute({ path: '/favorite', method: HttpMethod.Get, handler: this.indexFavorite }); //Получить избранные предложения
     this.addRoute({ path: '/premium/:city', method: HttpMethod.Get, handler: this.indexPremiumForCity, middlewares: [new ValidateCityMiddleware('city')]}); //Получить премиальные предложения для города
-    this.addRoute({ path: '/:offerId', method: HttpMethod.Get, handler: this.show, middlewares: [new ValidateObjectIdMiddleware('offerId')] });
-    this.addRoute({ path: '/:offerId', method: HttpMethod.Delete, handler: this.delete,middlewares: [new ValidateObjectIdMiddleware('offerId')] }); //Удалить предложение
-    this.addRoute({ path: '/:offerId', method: HttpMethod.Patch, handler: this.update, middlewares: [new ValidateObjectIdMiddleware('offerId'), new ValidateDtoMiddleware(UpdateOfferDto),] }); //Обновить предложение
-    this.addRoute({ path: '/comments/:offerId', method: HttpMethod.Get, handler: this.getComments,middlewares: [new ValidateObjectIdMiddleware('offerId')] });//Получить список комментариев
+    this.addRoute({ path: '/:offerId', method: HttpMethod.Get, handler: this.show, middlewares: [new ValidateObjectIdMiddleware('offerId'), new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId')] });
+    this.addRoute({ path: '/:offerId', method: HttpMethod.Delete, handler: this.delete,middlewares: [new ValidateObjectIdMiddleware('offerId'), new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId')] }); //Удалить предложение
+    this.addRoute({ path: '/:offerId', method: HttpMethod.Patch, handler: this.update, middlewares: [new ValidateObjectIdMiddleware('offerId'), new ValidateDtoMiddleware(UpdateOfferDto), new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId')] }); //Обновить предложение
+    this.addRoute({ path: '/comments/:offerId', method: HttpMethod.Get, handler: this.getComments,middlewares: [new ValidateObjectIdMiddleware('offerId'),new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId')] });//Получить список комментариев
   }
 
 
@@ -78,15 +78,6 @@ export class OfferController extends BaseController {
   public async show({ params }: Request<ParamOfferId>, res: Response): Promise<void> {
     const { offerId } = params;
     const offer = await this.offerService.findByOfferId(offerId);
-
-    if (! offer) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        `Предложение с id: ${offerId} не найдено.`,
-        'OfferController'
-      );
-    }
-
     this.ok(res, fillDTO(OfferRdo, offer));
   }
 
@@ -99,16 +90,8 @@ export class OfferController extends BaseController {
 
   //изменить предложение
   public async update({ body, params }: Request<ParamOfferId, unknown, UpdateOfferDto>, res: Response): Promise<void> {
-    const updatedOffer = await this.offerService.updateById(params.offerId, body);
-
-    if (!updatedOffer) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        `Offer with id ${params.offerId} not found.`,
-        'OfferController'
-      );
-    }
-
+    const { offerId } = params;
+    const updatedOffer = await this.offerService.updateById(offerId, body);
     this.ok(res, fillDTO(OfferRdo, updatedOffer));
   }
 
@@ -116,54 +99,13 @@ export class OfferController extends BaseController {
   public async delete({ params }: Request<ParamOfferId>, res: Response): Promise<void> {
     const { offerId } = params;
     const offer = await this.offerService.deleteById(offerId);
-
-    if (!offer) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        `Offer with id ${offerId} not found.`,
-        'OfferController'
-      );
-    }
     await this.commentService.deleteByOfferId(offerId);
-
     this.noContent(res, offer);
   }
 
   public async getComments({ params }: Request<ParamOfferId>, res: Response): Promise<void> {
     const { offerId } = params;
-    if (!await this.offerService.exists(offerId)) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        `Offer with id ${offerId} not found.`,
-        'OfferController'
-      );
-    }
-
     const comments = await this.commentService.findByOfferId(offerId);
     this.ok(res, fillDTO(CommentRdo, comments));
   }
-
-  // public async create(
-  //   { body }: CreateOfferRequest,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   try {
-  //     console.log(body);
-  //     const existOffer = await this.offerService.exists(body.id);
-
-  //     if (existOffer) {
-  //       throw new HttpError(
-  //         StatusCodes.UNPROCESSABLE_ENTITY,
-  //         `Предложение с id: «${body.id}» уже существует.`,
-  //         'OfferController');
-  //     }
-
-  //     const result = await this.offerService.create(body);
-  //     this.created(res, fillDTO(OfferRdo, result));
-  //   } catch (error) {
-  //     return next(error);
-  //   }
-
-  // }
 }
