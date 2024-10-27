@@ -107,7 +107,7 @@ Content-Type: application/json
 
 {
   "comment": "Это просто восхитительное место еще раз!",
-  "rating": 6,
+  "rating": 5,
   "offerId": "67148ef0fe7da9c81054756a",
   "userId": "66fd4ecee524f5494b23979c"
 }
@@ -118,3 +118,20 @@ Content-Type: application/json
 GET http://localhost:5000/offers/comments/67148ef0fe7da9c81054756a HTTP/1.1
 
 ###
+
+
+###
+
+## Отправить изображение
+
+POST http://localhost:5000/66fb7a9d8eb2d359e21834ac/avatar HTTP/1.1
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="avatar"; filename="avatar-max.jpg"
+Content-Type: image/png
+
+< E:\avatar-max.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+##

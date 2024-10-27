@@ -41,6 +41,8 @@ export class UpdateOfferDto {
 
   @IsOptional()
   @IsNumber({},{ message: UpdateOfferValidationMessage.rating.invalidFormat })
+  @Min(1, { message: UpdateOfferValidationMessage.rating.minValue })
+  @Max(5, { message: UpdateOfferValidationMessage.rating.maxValue })
   public rating?: number;
 
   @IsOptional()
