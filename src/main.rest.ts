@@ -9,6 +9,7 @@ import { createRestApplicationContainer } from './rest/rest.container.js';
 import { createUserContainer } from './shared/modules/user/index.js';
 import { createOfferContainer } from './shared/modules/offer/index.js';
 import { createCommentContainer } from './shared/modules/comments/index.js';
+import { createAuthContainer } from './shared/modules/auth/index.js';
 
 
 async function bootstrap() {
@@ -17,6 +18,7 @@ async function bootstrap() {
     createUserContainer(),
     createOfferContainer(),
     createCommentContainer(),
+    createAuthContainer(),
   );
 
 

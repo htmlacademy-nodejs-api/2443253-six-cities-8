@@ -18,6 +18,7 @@ import { CommentRdo } from '../comments/rdo/comment.rdo.js';
 import { ValidateObjectIdMiddleware } from '../../../rest/middleware/validate-objectId.interface.js';
 import { ValidateCityMiddleware } from '../../../rest/middleware/validate-city.interface.js';
 import { ValidateDtoMiddleware } from '../../../rest/middleware/validate-dto.middleware.js';
+import { PrivateRouteMiddleware } from '../../../rest/middleware/private-route.middleware.js';
 
 @injectable()
 export class OfferController extends BaseController {
@@ -31,12 +32,12 @@ export class OfferController extends BaseController {
     this.logger.info('Register routes for OfferController…');
 
     this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.index });
-    this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.create, middlewares: [new ValidateDtoMiddleware(CreateOfferDto)]});
-    this.addRoute({ path: '/favorite', method: HttpMethod.Get, handler: this.indexFavorite }); //Получить избранные предложения
+    this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.create, middlewares: [new PrivateRouteMiddleware(),new ValidateDtoMiddleware(CreateOfferDto)]});
+    this.addRoute({ path: '/favorite', method: HttpMethod.Get, handler: this.indexFavorite,middlewares: [new PrivateRouteMiddleware()] }); //Получить избранные предложения
     this.addRoute({ path: '/premium/:city', method: HttpMethod.Get, handler: this.indexPremiumForCity, middlewares: [new ValidateCityMiddleware('city')]}); //Получить премиальные предложения для города
     this.addRoute({ path: '/:offerId', method: HttpMethod.Get, handler: this.show, middlewares: [new ValidateObjectIdMiddleware('offerId'), new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId')] });
-    this.addRoute({ path: '/:offerId', method: HttpMethod.Delete, handler: this.delete,middlewares: [new ValidateObjectIdMiddleware('offerId'), new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId')] }); //Удалить предложение
-    this.addRoute({ path: '/:offerId', method: HttpMethod.Patch, handler: this.update, middlewares: [new ValidateObjectIdMiddleware('offerId'), new ValidateDtoMiddleware(UpdateOfferDto), new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId')] }); //Обновить предложение
+    this.addRoute({ path: '/:offerId', method: HttpMethod.Delete, handler: this.delete,middlewares: [new PrivateRouteMiddleware(),new ValidateObjectIdMiddleware('offerId'), new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId')] }); //Удалить предложение
+    this.addRoute({ path: '/:offerId', method: HttpMethod.Patch, handler: this.update, middlewares: [new PrivateRouteMiddleware(),new ValidateObjectIdMiddleware('offerId'), new ValidateDtoMiddleware(UpdateOfferDto), new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId')] }); //Обновить предложение
     this.addRoute({ path: '/comments/:offerId', method: HttpMethod.Get, handler: this.getComments,middlewares: [new ValidateObjectIdMiddleware('offerId'),new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId')] });//Получить список комментариев
   }
 
@@ -82,8 +83,8 @@ export class OfferController extends BaseController {
   }
 
   //Создать предложение
-  public async create({ body }: CreateOfferRequest, res: Response): Promise<void> {
-    const result = await this.offerService.create(body);
+  public async create({ body, tokenPayload }: CreateOfferRequest, res: Response): Promise<void> {
+    const result = await this.offerService.create({...body, userId: tokenPayload.id});
     const offer = await this.offerService.findByOfferId(result.id);
     this.created(res, fillDTO(OfferRdo, offer));
   }
