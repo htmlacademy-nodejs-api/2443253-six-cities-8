@@ -1,5 +1,5 @@
 
-import { IsArray, IsUrl, IsDateString, IsEnum, IsInt, IsMongoId, Max, MaxLength, Min, MinLength, IsObject, IsBoolean, IsNumber } from 'class-validator';
+import { IsArray, IsUrl, IsDateString, IsEnum, IsInt, Max, MaxLength, Min, MinLength, IsObject, IsBoolean, IsNumber } from 'class-validator';
 import { City } from '../../../types/city.enum.js';
 import { Goods } from '../../../types/index.js';
 import { Location } from '../../../types/location.type.js';
@@ -62,7 +62,7 @@ export class CreateOfferDto {
   @IsEnum(Goods,{each:true, message: CreateOfferValidationMessage.userId.invalidId })
   public goods: Goods[];
 
-  @IsMongoId({ message: CreateOfferValidationMessage.userId.invalidId })
+
   public userId: string;
 
   public commentsCount: number;
