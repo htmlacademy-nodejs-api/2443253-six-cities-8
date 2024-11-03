@@ -2,15 +2,13 @@ import { Expose, Type } from 'class-transformer';
 
 import { UserRdo } from '../../user/rdo/user.rdo.js';
 
+//Перечень возвращаемых полей
 export class CommentRdo {
   @Expose()
   public id: string;
 
   @Expose()
   public comment: string;
-
-  @Expose()
-  public offerId: string;
 
   @Expose()
   public rating: number;

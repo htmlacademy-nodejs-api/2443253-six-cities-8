@@ -19,10 +19,11 @@ import { UserRdo } from './rdo/user.rdo.js';
 import { UserService } from './user-service.interface.js';
 import { ValidateDtoMiddleware } from '../../../rest/middleware/validate-dto.middleware.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
-import { LoginUserDto } from './index.js';
 import { ValidateObjectIdMiddleware } from '../../../rest/middleware/validate-objectId.interface.js';
 import { AuthService } from '../auth/index.js';
 import { LoggedUserRdo } from './rdo/logged-user.rdo.js';
+import { LoginUserDto } from './index.js';
+import { UploadUserAvatarRdo } from './rdo/upload-user-avatar.rdo.js';
 
 
 @injectable()
@@ -37,8 +38,11 @@ export class UserController extends BaseController {
     super(logger);
     this.logger.info('Register routes for UserController…');
 
+    //Регистрация нового пользователя
     this.addRoute({ path: '/register', method: HttpMethod.Post, handler: this.create, middlewares: [new ValidateDtoMiddleware(CreateUserDto)] });
+    //Авторизация пользователя
     this.addRoute({ path: '/login', method: HttpMethod.Post, handler: this.login, middlewares: [new ValidateDtoMiddleware(LoginUserDto)] });
+    //Загрузка аватара
     this.addRoute({
       path: '/:userId/avatar',
       method: HttpMethod.Post,
@@ -48,6 +52,7 @@ export class UserController extends BaseController {
         new UploadFileMiddleware(this.configService.get('UPLOAD_DIRECTORY'), 'avatar'),
       ]
     });
+    //Проверка состояния
     this.addRoute({
       path: '/login',
       method: HttpMethod.Get,
@@ -78,19 +83,10 @@ export class UserController extends BaseController {
   ): Promise<void> {
     const user = await this.authService.verify(body);
     const token = await this.authService.authenticate(user);
-    const responseData = fillDTO(LoggedUserRdo, {
-      email: user.email,
-      token,
-    });
-    this.ok(res, responseData);
+    const responseData = fillDTO(LoggedUserRdo, user);
+    this.ok(res, Object.assign(responseData, { token }));
   }
 
-  //Загрузка аватара
-  public async uploadAvatar(req: Request, res: Response) {
-    this.created(res, {
-      filepath: req.file?.path
-    });
-  }
 
   public async checkAuthenticate({ tokenPayload: { email }}: Request, res: Response) {
     const foundedUser = await this.userService.findByEmail(email);
@@ -105,4 +101,14 @@ export class UserController extends BaseController {
 
     this.ok(res, fillDTO(LoggedUserRdo, foundedUser));
   }
+
+  //Загрузка аватара
+  public async uploadAvatar({ params, file }: Request, res: Response) {
+    const { userId } = params;
+    const uploadFile = { avatarPath: file?.filename };
+    await this.userService.updateById(userId, uploadFile);
+    this.created(res, fillDTO(UploadUserAvatarRdo, { filepath: uploadFile.avatarPath }));
+  }
+
+
 }

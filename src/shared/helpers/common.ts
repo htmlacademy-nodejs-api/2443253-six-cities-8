@@ -1,6 +1,9 @@
 import chalk from 'chalk';
 import { FlatOffer, Location, Offer, User } from '../types/index.js';
 import { ClassConstructor, plainToInstance } from 'class-transformer';
+import { ValidationError } from 'class-validator';
+import { ValidationErrorField } from '../../rest/types/validation-error-field.type.js';
+import { ApplicationError } from '../../rest/index.js';
 
 //Случайное число в диапазоне [min, max]
 export function generateRandomValue(min:number, max: number, numAfterDigit = 0) {
@@ -51,8 +54,18 @@ export function fillDTO<T, V>(someDto: ClassConstructor<T>, plainObject: V) {
 }
 
 //создает объект со свойством - ошибка
-export function createErrorObject(message: string) {
-  return {
-    error: message,
-  };
+export function createErrorObject(errorType: ApplicationError, error: string, details: ValidationErrorField[] = []) {
+  return { errorType, error, details };
+}
+
+export function reduceValidationErrors(errors: ValidationError[]): ValidationErrorField[] {
+  return errors.map(({ property, value, constraints}) => ({
+    property,
+    value,
+    messages: constraints ? Object.values(constraints) : []
+  }));
+}
+
+export function getFullServerPath(host: string, port: number) {
+  return `http://${host}:${port}`;
 }

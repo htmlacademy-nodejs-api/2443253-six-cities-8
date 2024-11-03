@@ -7,11 +7,10 @@ import { Logger } from '../../libs/logger/index.js';
 import { OfferEntity } from './offer.entity.js';
 import { CreateOfferDto } from './dto/create-offer.dto.js';
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
-import { MAX_PREMIUN_COUNT } from './offer.constant.js';
+import { MAX_OFFER_COUNT, MAX_PREMIUN_COUNT } from './offer.constant.js';
 import { CommentEntity } from '../comments/index.js';
 import { HttpError } from '../../../rest/index.js';
 import { StatusCodes } from 'http-status-codes';
-import { MAX_COMMENTS_COUNT } from '../comments/comment.constant.js';
 
 
 @injectable()
@@ -83,26 +82,31 @@ export class DefaultOfferService implements OfferService {
   //2.4.Получение списка предложений по аренде.
   public async find(): Promise<DocumentType<OfferEntity>[]> {
 
-    return this.offerModel
-      .aggregate([
-        {
-          $lookup: {
-            from: 'comments',
-            let: { offerId: '$_id'},
-            pipeline: [
-              { $match: { $expr: { $in: ['$$offerId', '$offerId'] } } },
-              { $project: { _id: 1}}
-            ],
-            as: 'comments'
-          },
-        },
-        { $addFields:
-          { id: { $toString: '$_id'}, commentCount: { $size: '$comments'}}
-        },
-        { $unset: 'comments' },
-        { $limit: MAX_COMMENTS_COUNT },
-        { $sort: { commentCount: SortType.Down } }//Сортировка по количеству комментариев.
-      ]).exec();
+    // return this.offerModel
+    //   .aggregate([
+    //     {
+    //       $lookup: {
+    //         from: 'comments',
+    //         let: { offerId: '$_id'},
+    //         pipeline: [
+    //           { $match: { $expr: { $in: ['$$offerId', '$offerId'] } } },
+    //           { $project: { _id: 1}}
+    //         ],
+    //         as: 'comments'
+    //       },
+    //     },
+    //     { $addFields:
+    //       { id: { $toString: '$_id'}, commentCount: { $size: '$comments'}}
+    //     },
+    //     { $unset: 'comments' },
+    //     { $limit: MAX_COMMENTS_COUNT },
+    //     { $sort: { commentCount: SortType.Down } }//Сортировка по количеству комментариев.
+    //   ]).exec();
+    return this.offerModel.find()
+      .limit(MAX_OFFER_COUNT).
+      sort({ createdAt: SortType.Down })
+      .populate(['userId'])
+      .exec();
   }
 
   //2.12.Получение списка премиальных предложений для города.
