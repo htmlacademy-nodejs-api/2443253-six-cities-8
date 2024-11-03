@@ -103,31 +103,12 @@ paths:
                 $ref: '#/components/schemas/authError'
 
 
-
-
-  /six-cities/logout:
-    delete:
-      tags:
-        - six-cities
-      summary: Завершение сеанса
-      description: Завершает сеанс работы — выход из закрытой части приложения.
-      parameters:
-      - name: X-Token
-        in: header
-        description: Авторизационный токен пользователя
-        required: true
-        schema:
-         $ref: '#/components/schemas/token'
-      responses:
-        "204":
-          description: Сеанс завершен
-
   /six-cities/offers:
     get:
       tags:
         - six-cities
-      summary: Получить список предложений
-      description: Возвращает массив предложений для предварительного просмотра. Каждое предложение описано в виде объекта. Обратите внимание, что заголовок X-Token, для данного маршрута, не является обязательным. Для авторизованного пользователя данные о предложениях содержат флаг isFavorite.
+      summary: Получить список предложений.
+      description: Возвращает массив предложений для предварительного просмотра. Каждое предложение описано в виде объекта. Авторизованные и анонимные пользователи
       parameters:
       - name: X-Token
         in: header
@@ -149,8 +130,8 @@ paths:
     get:
       tags:
         - six-cities
-      summary: Получить предложение
-      description: Возвращает предложение с идентификатором offerId. Обратите внимание, что заголовок X-Token, для данного маршрута, не является обязательным. Для авторизованного пользователя данные о предложении содержат флаг isFavorite
+      summary: Получить детальное предложение
+      description: Возвращает предложение с идентификатором offerId. Авторизованные и анонимные пользователи
       parameters:
       - name: offerId
         in: path
@@ -181,7 +162,7 @@ paths:
       tags:
         - six-cities
       summary: Отредактировать предложение
-      description: Внести изменения в предложение с идентификатором offerId. Обратите внимание, что заголовок X-Token, для данного маршрута, не является обязательным. Для авторизованного пользователя данные о предложении содержат флаг isFavorite
+      description: Внести изменения в предложение с идентификатором offerId. Доступно только авторизованному пользователю - автору данного предложения
       parameters:
       - name: offerId
         in: path
@@ -193,6 +174,7 @@ paths:
       - name: X-Token
         in: header
         description: Авторизационный токен пользователя
+        required: true
         schema:
          $ref: '#/components/schemas/token'
       requestBody:
@@ -252,41 +234,8 @@ paths:
                 $ref: '#/components/schemas/notFoundOfferError'
 
 
-  /six-cities/offers/{offerId}/nearby:
-    get:
-      tags:
-        - six-cities
-      summary: Получить список предложений неподалеку
-      description: Возвращает массив предложений. Каждое предложение описано в виде объекта. Обратите внимание, что заголовок X-Token, для данного маршрута, не является обязательным. Для авторизованного пользователя данные о предложениях содержат флаг isFavorite
-      parameters:
-      - name: offerId
-        in: path
-        description: Уникальный идентификатор предложения
-        required: true
-        schema:
-          type: string
-          examples: [6af6f711-c28d-4121-82cd-e0b462a27f00]
-      - name: X-Token
-        in: header
-        description: Авторизационный токен пользователя
-        schema:
-         $ref: '#/components/schemas/token'
-      responses:
-        "200":
-          description: Массив предложений
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/offersPreview'
-        "404":
-          description: Предложение не найдено
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/notFoundOfferError'
 
-
-  /six-cities/favorite:
+  /six-cities/offers/favorites:
      get:
       tags:
         - six-cities
@@ -297,7 +246,6 @@ paths:
         in: header
         description: Авторизационный токен пользователя
         required: true
-
         schema:
          $ref: '#/components/schemas/token'
       responses:
@@ -315,12 +263,13 @@ paths:
                 $ref: '#/components/schemas/notFoundOfferError'
 
 
-  /six-cities/favorite/{offerId}/{status}:
+  /six-cities/offers/favorites/{offerId}:
     post:
       tags:
         - six-cities
-      summary: Изменить статус у избранного предложения
-      description: Возвращает предложение с идентификатором offerId. Обратите внимание, что заголовок X-Token, для данного маршрута, не является обязательным. Для авторизованного пользователя данные о предложении содержат флаг isFavorite
+      summary: Изменить статус у избранного предложения на противоположный
+      description: Возвращает предложение с идентификатором offerId.
+                  Только авторизованные пользователи
       parameters:
       - name: offerId
         in: path
@@ -329,13 +278,6 @@ paths:
         schema:
           type: string
           examples: [6af6f711-c28d-4121-82cd-e0b462a27f00]
-      - name: status
-        in: path
-        description: Статус избранного предложения. Может быть 1 или 0, где 1 добавляет предложение в избранное, а 0 удаляет
-        required: true
-        schema:
-          type: number
-          examples: [0]
       - name: X-Token
         in: header
         description: Авторизационный токен пользователя
@@ -372,19 +314,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/notFoundOfferError'
 
-        "409":
-          description: Предложение уже в избранном
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/offerAlreadyInFavoriteError'
 
-  /six-cities/:city/premium:
+  /six-cities/offers/premium/{city}:
      get:
       tags:
         - six-cities
       summary: Получить список премиальных предложений для города
       description: Возвращает массив предложений с флагои Premium = true для выбранного города
+                  Авторизованные и анонимные пользователи
       parameters:
       - name: city
         in: path
@@ -414,6 +351,7 @@ paths:
         - six-cities
       summary: Получить список комментариев
       description: Возвращает список комментариев для предложения с идентификатором offerId
+                  Авторизованные и анонимные пользователи
       parameters:
       - name: offerId
         in: path
@@ -441,6 +379,7 @@ paths:
         - six-cities
       summary: Добавить новый комментарий
       description: Добавляет новый комментарий для предложения с идентификатором offerId
+                  Только авторизованные пользователи
       parameters:
       - name: offerId
         in: path

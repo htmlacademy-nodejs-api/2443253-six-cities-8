@@ -50,10 +50,10 @@
       "false"
     ],
     "types": [
-      "house",
-      "room",
-      "apartment",
-      "hotel"
+      "House",
+      "Room",
+      "Apartment",
+      "Hotel"
     ],
     "goods": [
       "Breakfast",

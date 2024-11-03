@@ -15,7 +15,6 @@ const userSchema = new Schema({
   },
   avatarPath: {
     type: String,
-    required: true,
     minlength: [5, 'Min length for avatar path is 5'],
   },
   firstname: {

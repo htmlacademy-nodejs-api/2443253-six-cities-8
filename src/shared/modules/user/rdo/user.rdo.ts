@@ -3,7 +3,10 @@ import { TypeUser } from '../../../types/user.type.js';
 
 export class UserRdo {
   @Expose()
-  public email: string ;
+  public id: string;
+
+  @Expose()
+  public email: string;
 
   @Expose()
   public avatarPath: string;
