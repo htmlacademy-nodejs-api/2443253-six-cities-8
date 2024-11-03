@@ -44,13 +44,6 @@ export class DefaultOfferService implements OfferService {
   //2.2.Редактирование предложения.
   public async updateById(offerId: string, dto: UpdateOfferDto): Promise<DocumentType<OfferEntity> | null> {
 
-    //Проверка на наличие всех комментариев в БД (сравнение с количеством комментариев в предложении)
-    // if (dto.categories) {
-    //   const foundCategories = await this.categoryModel.find({ _id: { $in: dto.categories }});
-    //   if (foundCategories.length !== dto.categories.length) {
-    //     throw new HttpError(StatusCodes.BAD_REQUEST, 'Some categories not exists', 'DefaultOfferService');
-    //   }
-    // }
     return this.offerModel
       .findByIdAndUpdate(offerId, dto, {new: true})
       .populate(['userId', 'comments'])
@@ -82,26 +75,6 @@ export class DefaultOfferService implements OfferService {
   //2.4.Получение списка предложений по аренде.
   public async find(): Promise<DocumentType<OfferEntity>[]> {
 
-    // return this.offerModel
-    //   .aggregate([
-    //     {
-    //       $lookup: {
-    //         from: 'comments',
-    //         let: { offerId: '$_id'},
-    //         pipeline: [
-    //           { $match: { $expr: { $in: ['$$offerId', '$offerId'] } } },
-    //           { $project: { _id: 1}}
-    //         ],
-    //         as: 'comments'
-    //       },
-    //     },
-    //     { $addFields:
-    //       { id: { $toString: '$_id'}, commentCount: { $size: '$comments'}}
-    //     },
-    //     { $unset: 'comments' },
-    //     { $limit: MAX_COMMENTS_COUNT },
-    //     { $sort: { commentCount: SortType.Down } }//Сортировка по количеству комментариев.
-    //   ]).exec();
     return this.offerModel.find()
       .limit(MAX_OFFER_COUNT).
       sort({ createdAt: SortType.Down })

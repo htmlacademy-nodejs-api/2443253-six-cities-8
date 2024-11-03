@@ -56,18 +56,6 @@ export class OfferRdo {
   @Type(()=> UserRdo)
   public userId: Ref<UserRdo>;
 
-  // @Expose()
-  // @Type(()=> CommentRdo)
-  // public comments: Ref<CommentRdo>[];
-
-  // @prop({
-  //   ref: CommentEntity,
-  //   required: true,
-  //   default:[],
-  //   _id: false
-  // })
-  // public comments?: Ref<CommentEntity>[];
-
   @Expose()
   public commentsCount: number;
 
