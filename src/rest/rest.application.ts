@@ -30,6 +30,15 @@ export class RestApplication {
   ) {
     this.server = express();
   }
+  // private async checkEnv() {
+  //   const env = this.config.get('NODE_ENV');
+  //   if (env !== 'production') {
+  //     this.logger.info('Check environment...');
+  //     await this.checkEnv();
+  //     this.logger.info('Check environment completed');
+  //   }
+  // }
+  // }
 
   private async initDb() {
     const mongoUri = getMongoURI(

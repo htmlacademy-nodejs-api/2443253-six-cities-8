@@ -20,9 +20,8 @@ export class RestConfig implements Config<RestSchema> {
     if (parsedOutput.error) {
       throw new Error('Can\'t read .env file. Perhaps the file does not exists.');
     }
-
     configRestSchema.load({});
-    configRestSchema.validate({ allowed: 'strict', output: this.logger.info });
+    configRestSchema.validate({ allowed: 'strict', output: this.logger.info});
 
     this.config = configRestSchema.getProperties();
     this.logger.info('.env file found and successfully parsed!');
@@ -32,3 +31,5 @@ export class RestConfig implements Config<RestSchema> {
     return this.config[key];
   }
 }
+
+

@@ -131,6 +131,7 @@ export class OfferController extends BaseController {
     this.noContent(res, deletedOffer);
   }
 
+  //Получить комментарий  для предложения offerId
   public async getComments({ params }: Request<ParamOfferId>, res: Response): Promise<void> {
     const { offerId } = params;
     const comments = await this.commentService.findByOfferId(offerId);

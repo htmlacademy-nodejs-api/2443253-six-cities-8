@@ -58,7 +58,7 @@ npm run ts -- <Путь к модулю с ts-кодом>
 
 Пакет `ts-node` позволяет выполнить TS-код в Node.js без предварительной компиляции. Используется только на этапе разработки.
 
-#### ЗАПУСТИТЬ ПРОЕКТ ####
+#### ЗАПУСК ПРОЕКТА ####
 
 ```bash
 npm start
@@ -121,6 +121,7 @@ npm run ts ./src/main.cli.ts -- --import ./src/mocks/mock-offers.tsv admin test 
 ### Файл `.env`
 ### Переменные окружения. Данный файл исключен из экспорта проекта в github.
 # Переменные окружения, необходимые для работы сервера
+# Пример содержимого файла:
 PORT=5000  - Порт, на котором работает данный сервер
 SALT='salt' - Соль для паролей
 DB_USER='admin' - user в БД 
@@ -130,7 +131,7 @@ DB_HOST='127.0.0.1' хост БД
 DB_NAME='six-cities' - имя БД
 UPLOAD_DIRECTORY='E:\HTML_PHP_JAVA\FULLSTACK\six-cities node.js Rest Api\2443253-six-cities-8\src\upload'
 JWT_SECRET='secret' - кодовое слово для формирования токенов
-
+STATIC_DIRECTORY_PATH='E:\HTML_PHP_JAVA\FULLSTACK\six-cities node.js Rest Api\2443253-six-cities-8\src\static'
 
 ### Остальное
 Все остальные файлы в проекте являются служебными. Пожалуйста, не удаляйте и не изменяйте их самовольно. Только если того требует задание или наставник.

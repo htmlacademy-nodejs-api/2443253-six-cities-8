@@ -8,7 +8,6 @@ import { DocumentType, mongoose, types } from '@typegoose/typegoose';
 export class DefaultCommentService implements CommentService {
   constructor(
      @inject(Component.CommentModel) private readonly commentModel: types.ModelType<CommentEntity>,
-    //  @inject(Component.OfferService) private readonly offerService: DefaultOfferService
   ) {}
 
 
@@ -22,26 +21,20 @@ export class DefaultCommentService implements CommentService {
     return +comment.averageRating.toFixed(1);
   }
 
-  //добавление комментария, подсчет и обновление среднего рейтинга текущего предложения
-  // public async create(dto: CreateCommentDto): Promise<DocumentType<CommentEntity>> {
-  //   const comment = await this.commentModel.create(dto);
-  //   // const averageRating = await this.countAverageRating(dto.offerId);
-  //   this.offerService.updateById(dto.offerId, {rating:averageRating});
-  //   return comment.populate('userId');
-  // }
-
+  //добавление комментария
   public async create(dto: CreateCommentDto): Promise<DocumentType<CommentEntity>> {
     const comment = await this.commentModel.create(dto);
     return comment.populate('userId');
   }
 
-  //выборка всех комметариев
+  //выборка всех комметариев для предложения offerId
   public async findByOfferId(offerId: string): Promise<DocumentType<CommentEntity>[]> {
     return this.commentModel
       .find({offerId})
       .populate('userId');
   }
 
+  //удаление всех комметариев для предложения offerId
   public async deleteByOfferId(offerId: string): Promise<number> {
     const result = await this.commentModel
       .deleteMany({offerId})
